@@ -1,4 +1,4 @@
-Brackets HTML Wrapper
+Brackets CSSfier
 ====================
 
 Convert HTML into SCSS / LESS.
