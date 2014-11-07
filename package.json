@@ -1,0 +1,25 @@
+{
+    "name": "brackets-cssfier",
+    "title": "CSSfier",
+    "version": "0.1.0",
+    "description": "Transform HTML into SCSS / LESS.",
+    "homepage": "https://github.com/rcaferati/brackets-cssfier",
+    "author": "rcaferati (https://github.com/rcaferati/)",
+    "license": "MIT",
+    "categories": "formatting",
+    "keywords": [
+        "format",
+        "formatting",
+        "css",
+        "scss",
+        "less",
+        "html2css",
+        "htmltocss"
+    ],
+    "files": [
+        "main.js"
+    ],
+    "engines": {
+        "brackets": ">=0.30.0"
+    }
+}
