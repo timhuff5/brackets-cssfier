@@ -30,7 +30,7 @@ define(function (require, exports, module) {
     function getSelectors(el) {
         if (!el) return;
         var selector = [];
-        if (el.className) {
+        if (el.className && el.className.split) {
             var classes = el.className.split(" ");
             for(var i in classes){
                 selector.push("." + classes[classes.length - 1 - i]);
@@ -52,7 +52,7 @@ define(function (require, exports, module) {
             if (!can_go) return;
             if (array.length > 0) {
                 for (var i = 0; i < array.length; i++) {
-                    //if (!can_go) return;
+                    if (!can_go) return;
                     if(params.callback){
                         can_go = params.callback(array[i], array, parent, depth, i);
                     }
@@ -216,20 +216,22 @@ define(function (require, exports, module) {
         var max = getLastDepth(cssi),
             selectors,
             current,
+            parent,
             has, i, j, n;
         for (i = max; i > 1; i--) {
             selectors = getSelectorsFromDepth(cssi, i);
             for (j in selectors) {
                 current = selectors[j];
+                parent = selectors[j].parent;
                 has = 0;
-                for (n in selectors) {
+                for (n in parent) {
                     if (n == j) continue;
-                    if (current.selector == selectors[n].selector /*|| current.tag == selectors[n].tag*/ ) {
+                    if (current.selector == parent[n].selector /*|| current.tag == selectors[n].tag*/ ) {
                         has = 1;
                     }
                 }
                 if (!has) {
-                    toParent(css, selectors[j].parent, selectors[j].element);
+                    toParent(css, parent, current.element);
                 }
             }
         }
@@ -316,9 +318,11 @@ define(function (require, exports, module) {
             all_ = {},
             css = [];        
 
+        
+        
         populate(object, css, 0);
         refactorAll(css);
-        emptyCheck(css);
+//        emptyCheck(css);
         
         var Printed = printArray(css),
             from = codeMirror.getCursor(true),
