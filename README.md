@@ -1,7 +1,7 @@
 Brackets CSSfier
 ====================
 
-Convert HTML into SCSS / LESS.
+Convert HTML into SCSS/LESS by pasting HTML blocks into SCSS/LESS file.
 
 ## Installation ##
 
@@ -22,6 +22,9 @@ Convert HTML into SCSS / LESS.
 ----------------
 
 ## Changelog ##
+
+###0.1.2
+- Added support for LESS files
 
 ###0.1.0
 - Initial release

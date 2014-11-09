@@ -291,7 +291,7 @@ define(function (require, exports, module) {
     }   
     
     function run(codeMirror, change) {
-        if (change.origin !== "paste" || change.origin != "paste" || !isFileExt("scss") || running) {
+        if (change.origin !== "paste" || change.origin != "paste" || (!isFileExt("scss") && !!isFileExt("less")) || running) {
             return;
         }
         
