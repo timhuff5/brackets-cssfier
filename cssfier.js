@@ -1,5 +1,5 @@
 define(function (require, exports, module) {
-    
+
     var DocumentManager = brackets.getModule("document/DocumentManager"),
         PreferencesManager = brackets.getModule("preferences/PreferencesManager"),
         lines = 0,
@@ -26,37 +26,38 @@ define(function (require, exports, module) {
         }
         return selector;
     }
-    
+
     function getSelectors(el) {
         if (!el) return;
         var selector = [];
         if (el.className && el.className.split) {
             var classes = el.className.split(" ");
-            for(var i in classes){
+            for (var i in classes) {
                 selector.push("." + classes[classes.length - 1 - i]);
             }
         }
         if (el.id) {
             selector.push("#" + el.id);
-        }        
-        if(selector.length==0){
+        }
+        if (selector.length === 0) {
             selector.push(el.tagName.toLowerCase());
         }
         return selector;
     }
-    
-    function recursive(array, params){
+
+    function recursive(array, params) {
         params = params || {};
         var can_go = 1;
+
         function recursive(array, parent, depth) {
             if (!can_go) return;
             if (array.length > 0) {
                 for (var i = 0; i < array.length; i++) {
                     if (!can_go) return;
-                    if(params.callback){
+                    if (params.callback) {
                         can_go = params.callback(array[i], array, parent, depth, i);
                     }
-                    if(!can_go) return;
+                    if (!can_go) return;
                     if (array && array[i] && array[i].children.length > 0) {
                         recursive(array[i].children, array, depth + 1);
                     }
@@ -129,8 +130,8 @@ define(function (require, exports, module) {
 
     function getLastDepth(array) {
         var d = 0;
-        recursive(array,{
-            callback: function(el, array, parent, depth){
+        recursive(array, {
+            callback: function (el, array, parent, depth) {
                 if (depth > d) {
                     d = depth;
                 }
@@ -139,13 +140,13 @@ define(function (require, exports, module) {
         });
         return d;
     }
-    
+
     function getSelectorsFromDepth(array, n) {
         var result = [],
             root;
         recursive(array, {
-            callback: function(el, array, parent, depth){
-                if(depth == 0){
+            callback: function (el, array, parent, depth) {
+                if (depth === 0) {
                     root = el;
                 }
                 if (depth == n) {
@@ -166,7 +167,7 @@ define(function (require, exports, module) {
     function toParent(array, parent, element) {
         var result = [];
         recursive(array, {
-            callback: function(el, arr, parent, depth, i){
+            callback: function (el, arr, parent, depth, i) {
                 var can_go = 1;
                 if (el === element) {
                     can_go = 0;
@@ -180,12 +181,12 @@ define(function (require, exports, module) {
         });
         return array;
     }
-    
+
     // checka se ficou algum espaço vazio entre depths e corrige;
     function emptyCheck(array) {
         var result = [];
         recursive(array, {
-            callback: function(el, arr, parent, depth){
+            callback: function (el, arr, parent, depth) {
                 if (parent) {
                     var dif = el.depth - parent[0].depth;
                     if (dif > 1) {
@@ -197,7 +198,7 @@ define(function (require, exports, module) {
         });
     }
 
-    
+
     function addDepth(index, css, selector, tag, depth) {
         if (css[index]) {
             while (css[index]) {
@@ -211,7 +212,7 @@ define(function (require, exports, module) {
         css[index].children = [];
         return index;
     }
-    
+
     function refactor(cssi, css) {
         var max = getLastDepth(cssi),
             selectors,
@@ -235,12 +236,12 @@ define(function (require, exports, module) {
                 }
             }
         }
-    }    
-    
-    function refactorAll(array){
+    }
+
+    function refactorAll(array) {
         var result = [];
         recursive(array, {
-            callback: function(el, arr, parent, depth){
+            callback: function (el, arr, parent, depth) {
                 refactor([el], array);
                 if (parent) {
                     var dif = el.depth - parent[0].depth;
@@ -251,8 +252,8 @@ define(function (require, exports, module) {
                 return true;
             }
         });
-    }    
-    
+    }
+
     function populate(all, css, depth) {
         all = all.children();
         var i = 0,
@@ -262,48 +263,47 @@ define(function (require, exports, module) {
             ready;
 
         all.each(function () {
-            var z,x;
+            var z, x;
             selector = getSelectors(this);
             index = [];
-            for(z in css){
-                for(x in selector){
-                    if(css[z].selector == selector[x]){
+            for (z in css) {
+                for (x in selector) {
+                    if (css[z].selector == selector[x]) {
                         index.push(x);
                     }
                 }
             }
             var to_add = [];
-            for(x in selector){
-                if(
-                    index.indexOf(x) == -1 
-                    && 
-                    to_add.indexOf(selector[x]) == -1){
-                        to_add.push(selector[x]);
+            for (x in selector) {
+                if (
+                    index.indexOf(x) == -1 &&
+                    to_add.indexOf(selector[x]) == -1) {
+                    to_add.push(selector[x]);
                 }
             }
-            for(x in to_add){
-                index = addDepth(i, css, to_add[x], this.tagName.toLowerCase(), depth);              
+            for (x in to_add) {
+                index = addDepth(i, css, to_add[x], this.tagName.toLowerCase(), depth);
             }
-            if ($(this).children().length > 0 && to_add.length>0) {
+            if ($(this).children().length > 0 && to_add.length > 0) {
                 populate($(this), css[index].children, depth + 1);
             }
         });
-    }   
-    
+    }
+
     function run(codeMirror, change) {
         if (change.origin !== "paste" || change.origin != "paste" || (!isFileExt("scss") && !isFileExt("less")) || running) {
             return;
         }
-        
+
         running = 1;
         lines = 0;
         var text = change.text,
             allText = "";
 
         for (var i = 0, l = text.length; i < l; i++) {
-            var allText = allText + text[i];
+            allText = allText + text[i];
         }
-        
+
         allText = allText.replace(/[\s]+/mig, " ")
             .replace(/^[\s]+/mig, "")
             .replace(/[\s]+$/mig, "")
@@ -316,22 +316,22 @@ define(function (require, exports, module) {
         var object = $("<div>" + allText + "</div>"),
             all = object,
             all_ = {},
-            css = [];        
+            css = [];
 
-        
-        
+
+
         populate(object, css, 0);
         refactorAll(css);
-//        emptyCheck(css);
-        
+        //        emptyCheck(css);
+
         var Printed = printArray(css),
             from = codeMirror.getCursor(true),
             to = codeMirror.getCursor(false),
             line = codeMirror.getLine(from.line);
         codeMirror.replaceRange(Printed.text, change.from, from);
-        setTimeout(function(){
+        setTimeout(function () {
             running = 0;
-        },100);
+        }, 100);
     }
 
     return {
