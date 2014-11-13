@@ -182,7 +182,6 @@ define(function (require, exports, module) {
         return array;
     }
 
-    // checka se ficou algum espaço vazio entre depths e corrige;
     function emptyCheck(array) {
         var result = [];
         recursive(array, {
@@ -318,20 +317,19 @@ define(function (require, exports, module) {
             all_ = {},
             css = [];
 
-
-
         populate(object, css, 0);
         refactorAll(css);
-        //        emptyCheck(css);
+        emptyCheck(css);
 
         var Printed = printArray(css),
             from = codeMirror.getCursor(true),
             to = codeMirror.getCursor(false),
             line = codeMirror.getLine(from.line);
+        
         codeMirror.replaceRange(Printed.text, change.from, from);
         setTimeout(function () {
             running = 0;
-        }, 100);
+        }, 150);
     }
 
     return {
